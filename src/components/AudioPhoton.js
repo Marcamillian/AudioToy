@@ -1,5 +1,4 @@
-import {stampit} from 'stampit';
-
+import stampit from '../../node_modules/stampit';
 /*
 == state == 
 context
@@ -26,16 +25,18 @@ const AudioPhoton = stampit({
     this.oscillator.type = this.waveform;
 
     this.oscillator.connect(this.gainNode);
-    this.gainNode.connect(this.context.destination);
   },
   methods:{
     play(){
-      this.gainNode.gain.setValueAtTime(0.5, this.context.currentTime);
-      this.oscillator.start()
+      
+      if (this.context.state == 'suspended'){
+        this.context.resume();
+        this.oscillator.start()
+      }
+      this.gainNode.connect(this.context.destination)
     },
     stop(){
-      this.gainNode.gain.exponentialRampToValueAtTime(0.001, this.contex.currentTime+1);
-      this.oscillator.stop(this.context.currentTime+1)
+      this.gainNode.disconnect(this.context.destination)
     }
   }
 })
