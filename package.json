@@ -4,12 +4,14 @@
   "description": "Simple Playing with web AudioAPI",
   "main": "app.js",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "rollup": "^2.21.0"
   },
   "devDependencies": {},
   "scripts": {
-    "start":"node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build":"rollup -c rollup.config.js"
   },
   "author": "Marc Vousden",
   "license": "ISC"
