@@ -2,8 +2,14 @@
 
 
 
+# Working to play the samples back
 
-# Working to load in samples and replay them
+## 26/07/2020
+
+Using the same tutorial from previous to play the sounds
+- Samples now playing
+
+# Working to load in samples
 
 ## 26/07/2020
 
@@ -24,3 +30,7 @@ Basis for the loading of samples - https://webaudioapi.com/samples/rhythm/
 
 
 Adjusted to use fetch() and Promises in the loading of samples
+
+## Before
+
+Using this book to see how to do a simple drum pattern (https://webaudioapi.com/book/Web_Audio_API_Boris_Smus.pdf) page 15 - Sheduling Precise Rhythms

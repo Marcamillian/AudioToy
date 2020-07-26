@@ -1,6 +1,7 @@
 import Sound from "./components/Sound";
 import AudioPhoton from './components/AudioPhoton';
 import BufferLoader from './components/BufferLoader';
+import BufferPlayer from './components/BufferPlayer';
 
 var context = new AudioContext();
 var sound = AudioPhoton({ context });
@@ -10,6 +11,7 @@ window.addEventListener('load', function(){
 
   var startBtn = document.querySelector('#start');
   var playBtn = document.querySelector('#play');
+  var playRhythmBtn = document.querySelector('#play-rhythm');
   var container = document.querySelector('.container');  
 
   //var sample = new RhythmSample();
@@ -28,6 +30,10 @@ window.addEventListener('load', function(){
       
   })
 
+  playRhythmBtn.addEventListener('click',function(){
+    bufferPlayer.play()
+  })
+
 })
 
 var sampleList = {
@@ -35,20 +41,22 @@ var sampleList = {
   'kick':'/sounds/kick.wav',
   'snare':'/sounds/snare.wav'
 };
-var bufferLoaded = ()=>{ console.log('done a thing')};
 
-var buffers = new BufferLoader({context, 'urlList':sampleList})
+var bufferLoader = new BufferLoader({context, 'urlList':sampleList})
 
-buffers.loadAllOnList()
+bufferLoader.loadAllOnList()
 .then(()=>{
   console.log('all samples loaded')
 });
+
+var bufferPlayer = new BufferPlayer({context, soundBuffers: bufferLoader.bufferList})
 
 
 window.audioToy = {
   context,
   sound,
-  buffers,
+  bufferLoader,
+  bufferPlayer
 }
 
 

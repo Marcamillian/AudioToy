@@ -22,7 +22,9 @@ const BufferLoader = stampit({
       // pick off the arrayBuffer response
       .then( function(response){ return response.arrayBuffer() })
       // decode the data
-      .then( loader.decodeAudioData )
+      .then( function(arrayBuffer){
+        return loader.context.decodeAudioData(arrayBuffer)
+      })
       // store the data on the loader
       .then( function(buffer){
         if(!buffer) throw new Error(`error decoding file data from: ${url}`)

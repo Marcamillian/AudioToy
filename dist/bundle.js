@@ -85,7 +85,9 @@
 	      // pick off the arrayBuffer response
 	      .then( function(response){ return response.arrayBuffer() })
 	      // decode the data
-	      .then( loader.decodeAudioData )
+	      .then( function(arrayBuffer){
+	        return loader.context.decodeAudioData(arrayBuffer)
+	      })
 	      // store the data on the loader
 	      .then( function(buffer){
 	        if(!buffer) throw new Error(`error decoding file data from: ${url}`)
@@ -104,6 +106,51 @@
 	  }
 	});
 
+	// feed it buffers and it can play them
+
+	const BufferPlayer = stampit_min({
+	  props:{
+	    context: null,
+	    tempo: 80,
+	    buffers:{}
+	  },
+	  init({context = this.context, soundBuffers= {}}){
+	    this.context = context;
+	    this.buffers = soundBuffers;
+	  },
+	  methods:{
+	    playSoundAt(buffer, time){
+	      var source = this.context.createBufferSource();
+	      source.buffer = buffer;
+	      source.connect(this.context.destination);
+	      source[source ? 'start' : 'noteOn'](time);
+	    },
+	    play(){
+	      var startTime = this.context.currentTime + 0.100;
+	      var eighthNoteTime = ( 60 / this.tempo) /2;
+
+	      for (var bar=0; bar < 2 ; bar++){
+	        var time = startTime + bar*8 *eighthNoteTime;
+
+	        // beats 1 & 5
+	        this.playSoundAt(this.buffers.kick, time);
+	        this.playSoundAt(this.buffers.kick, time + 4*eighthNoteTime);
+
+	        // beats 3 & 7
+	        this.playSoundAt(this.buffers.snare, time + 2*eighthNoteTime);
+	        this.playSoundAt(this.buffers.snare, time + 6*eighthNoteTime);
+
+	        // every beat 
+	        for( var i=0; i < 8; ++i ){
+	          this.playSoundAt(this.buffers.hihat, time + i*eighthNoteTime);
+	        }
+
+	      }
+	    }
+	  }
+
+	});
+
 	var context = new AudioContext();
 	var sound = AudioPhoton({ context });
 
@@ -112,6 +159,7 @@
 
 	  var startBtn = document.querySelector('#start');
 	  var playBtn = document.querySelector('#play');
+	  var playRhythmBtn = document.querySelector('#play-rhythm');
 	  var container = document.querySelector('.container');  
 
 	  //var sample = new RhythmSample();
@@ -130,6 +178,10 @@
 	      
 	  });
 
+	  playRhythmBtn.addEventListener('click',function(){
+	    bufferPlayer.play();
+	  });
+
 	});
 
 	var sampleList = {
@@ -138,18 +190,21 @@
 	  'snare':'/sounds/snare.wav'
 	};
 
-	var buffers = new BufferLoader({context, 'urlList':sampleList});
+	var bufferLoader = new BufferLoader({context, 'urlList':sampleList});
 
-	buffers.loadAllOnList()
+	bufferLoader.loadAllOnList()
 	.then(()=>{
 	  console.log('all samples loaded');
 	});
+
+	var bufferPlayer = new BufferPlayer({context, soundBuffers: bufferLoader.bufferList});
 
 
 	window.audioToy = {
 	  context,
 	  sound,
-	  buffers,
+	  bufferLoader,
+	  bufferPlayer
 	};
 
 })));
