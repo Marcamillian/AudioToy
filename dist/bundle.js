@@ -112,11 +112,16 @@
 	  props:{
 	    context: null,
 	    tempo: 80,
-	    buffers:{}
+	    buffers:{},
+	    bufferTracks:{}
 	  },
 	  init({context = this.context, soundBuffers= {}}){
 	    this.context = context;
 	    this.buffers = soundBuffers;
+	    // create a track for each buffer loaded
+	    Object.keys(soundBuffers).forEach((key)=>{
+	      this.bufferTracks[key] = new Array(16);
+	    });
 	  },
 	  methods:{
 	    playSoundAt(buffer, time){
@@ -127,26 +132,16 @@
 	    },
 	    play(){
 	      var startTime = this.context.currentTime + 0.100;
-	      var eighthNoteTime = ( 60 / this.tempo) /2;
+	      var sixteenthNoteTime = ( 60 / this.tempo) /4;
 
-	      for (var bar=0; bar < 2 ; bar++){
-	        var time = startTime + bar*8 *eighthNoteTime;
-
-	        // beats 1 & 5
-	        this.playSoundAt(this.buffers.kick, time);
-	        this.playSoundAt(this.buffers.kick, time + 4*eighthNoteTime);
-
-	        // beats 3 & 7
-	        this.playSoundAt(this.buffers.snare, time + 2*eighthNoteTime);
-	        this.playSoundAt(this.buffers.snare, time + 6*eighthNoteTime);
-
-	        // every beat 
-	        for( var i=0; i < 8; ++i ){
-	          this.playSoundAt(this.buffers.hihat, time + i*eighthNoteTime);
-	        }
-
-	      }
-	    }
+	      Object.entries(this.bufferTracks).forEach(([key, beats])=>{
+	         beats.forEach( (playNote, index) =>{
+	            if(playNote == true){
+	              this.playSoundAt(this.buffers[key], startTime + index*sixteenthNoteTime);
+	            }
+	         });
+	      });
+	    },
 	  }
 
 	});
@@ -159,7 +154,6 @@
 
 	  var startBtn = document.querySelector('#start');
 	  var playBtn = document.querySelector('#play');
-	  var playRhythmBtn = document.querySelector('#play-rhythm');
 	  var container = document.querySelector('.container');  
 
 	  //var sample = new RhythmSample();
@@ -178,10 +172,6 @@
 	      
 	  });
 
-	  playRhythmBtn.addEventListener('click',function(){
-	    bufferPlayer.play();
-	  });
-
 	});
 
 	var sampleList = {
@@ -195,16 +185,33 @@
 	bufferLoader.loadAllOnList()
 	.then(()=>{
 	  console.log('all samples loaded');
+	  var bufferPlayer = new BufferPlayer({context, soundBuffers: bufferLoader.bufferList});
+
+	  document.querySelector('#play-rhythm').addEventListener('click',function(){
+	    bufferPlayer.play();
+	  });
+
+	  const setDrumLoop = ()=>{
+	    const kicks = [true,0,0,0,   0,0,0,0,    true,0,0,0,    0,0,0,0];
+	    const snares = [0,0,0,0,   true,0,0,0,    0,0,0,0,    true,0,true,0];
+	    const hihats = [true,0,true,0,   true,0,true,0,    true,0,true,0,    true,0,true,0];
+
+	    bufferPlayer.bufferTracks['kick'] = kicks;
+	    bufferPlayer.bufferTracks['snare'] = snares;
+	    bufferPlayer.bufferTracks['hihat'] = hihats;
+
+	    return bufferPlayer;
+	  };
+
+	  setDrumLoop();
+
+	  window.audioToy = {
+	    context,
+	    sound,
+	    bufferLoader,
+	    bufferPlayer,
+	    setDrumLoop
+	  };
 	});
-
-	var bufferPlayer = new BufferPlayer({context, soundBuffers: bufferLoader.bufferList});
-
-
-	window.audioToy = {
-	  context,
-	  sound,
-	  bufferLoader,
-	  bufferPlayer
-	};
 
 })));
