@@ -6,7 +6,7 @@ let app = express();
 let server;
 
 app.use(express.static('./dist'));
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json())
 
 

@@ -6,7 +6,10 @@
 - I set up an express server and am capturing the POST data
 - Grouping creations into beat names but want them grouped into beats->beatName->beatArray
 - using this link to do this - https://mattstauffer.com/blog/a-little-trick-for-grouping-fields-in-an-html-form/
- 
+
+- with bodyparser extended: true set -- get the req.body in a nice javascript 
+- **NOW we want to get the same in browser**
+
 ## 08/08/2020
 - Using Web Components to build a tracker element
 - Trying to check that form is properly form....ed so that the POST request has array of beats

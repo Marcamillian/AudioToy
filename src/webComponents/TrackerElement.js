@@ -58,13 +58,6 @@ export default class TrackerElement extends HTMLElement{
     let rowLabel = document.createElement('td');
     rowLabel.textContent = trackName;
 
-    // hidden input to give track name to the input
-    let trackNameInput = document.createElement('input')
-    trackNameInput.setAttribute('type','text')
-    trackNameInput.setAttribute('name',`track[${index}][name]`)
-    trackNameInput.setAttribute('value',trackName)
-
-    rowLabel.appendChild(trackNameInput)
     newRow.appendChild(rowLabel)
 
     // fill with appropriate checkboxes (16 for 16 beats)
@@ -73,7 +66,7 @@ export default class TrackerElement extends HTMLElement{
 
       let beatCheckbox = document.createElement('input')
       beatCheckbox.setAttribute('type','checkbox')
-      beatCheckbox.setAttribute('name', `track[${index}][ticks]`)
+      beatCheckbox.setAttribute('name', `tracks[${trackName}]`)
       beatCheckbox.setAttribute('value', i);
       
       beatContainer.appendChild(beatCheckbox)
@@ -104,16 +97,11 @@ export default class TrackerElement extends HTMLElement{
 TrackerElement.prototype.getData = function(){
   let form = this.shadowRoot.querySelector('form')
 
-
   var formData = new FormData(form);
-
-  for (var [key, value] of formData.entries()) { 
-    console.log(key, value);
-  }
-
-  //or
 
   console.log(...formData)
 
-  return formData;
+  let formDataArray = new Array(...formData);
+
+  return formDataArray;
 }
