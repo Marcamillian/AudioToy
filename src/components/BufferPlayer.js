@@ -1,5 +1,4 @@
 import stampit from '../../node_modules/stampit';
-
 // feed it buffers and it can play them
 
 const BufferPlayer = stampit({

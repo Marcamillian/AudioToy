@@ -1,16 +1,48 @@
 <!DOCTYPE html>
 
 <head>
+  <script type="module">
+    import TrackerElement from '/components/TrackerElement.js';
+    customElements.define('sound-tracker', TrackerElement)
+  </script>
   <script src="bundle.js"></script>
+  
 </head>
 
 <body>
-    <h1>Something</h1>
-    
-    <div class="container">
-        <button class="button" id='play'>Play</button>
-        <button class="button" id='play-rhythm'>Play Rhythm</button>
-    </div> 
+  <h1>Something</h1>
+  
+  <div class="container">
+    <button class="button" id='play'>Play</button>
+    <button class="button" id='play-rhythm'>Play Rhythm</button>
+  </div> 
 
-    
+  <sound-tracker></sound-tracker>
+
+  <section>
+    <form action='/track' method='post'>
+      Person 1:
+      <label>First name</label>
+      <input name="people[1][first_name]">
+
+      <label>Last name</label>
+      <input name="people[1][last_name]">
+
+      <label>Email</label>
+      <input name="people[1][email]">
+
+      Person 2:
+      <label>First name</label>
+      <input name="people[2][first_name]">
+
+      <label>Last name</label>
+      <input name="people[2][last_name]">
+
+      <label>Email</label>
+      <input name="people[2][email]">
+
+      <input type='submit'/>
+    </form>
+  </section>
+
 </body>
