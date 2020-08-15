@@ -7,7 +7,8 @@
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "rollup": "^2.21.0",
-    "stampit": "^4.3.1"
+    "stampit": "^4.3.1",
+    "tape": "^5.0.1"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^13.0.0",
