@@ -1,4 +1,5 @@
 import BufferPlayer from './../components/BufferPlayer';
+import BufferLoader from './../components/BufferLoader';
 
 const template  = document.createElement('template')
 template.innerHTML = `
@@ -18,17 +19,12 @@ export default class TrackerElement extends HTMLElement{
   render(){
     let trackerTable = this.shadowRoot.querySelector('.tracker-container');
 
-    // apply the attributes from the connected 
-    
-    // add a row for each track that is attached to the element (in attribute?)
-    let tracks = {
-      'kick': 16,
-      'snare': 16
-    }
+    let sampleNames = Object.keys(JSON.parse(this.dataset.tracks))
+    let beatCount = parseInt(this.dataset.beatcount);
 
-    trackerTable.appendChild( this.genTrackerHeader(16))
+    trackerTable.appendChild( this.genTrackerHeader(beatCount))
 
-    Object.entries(tracks).forEach( ([rowName, beatCount], index)=>{
+    sampleNames.forEach( (rowName, index)=>{
       trackerTable.appendChild( this.genTrackerRow(index, rowName, beatCount) )
     })
 
@@ -44,7 +40,18 @@ export default class TrackerElement extends HTMLElement{
     // styling on the container
     this.style.display = 'block'
 
+    let sampleList = JSON.parse(this.dataset.tracks)
     // extract the attrubutes from the container
+      // get track names and url list
+      // get context for sounds
+    let context = new AudioContext()
+    let bufferLoader = new BufferLoader({'context':new AudioContext(), 'urlList':sampleList})
+    
+    bufferLoader.loadAllOnList()
+    .then( ()=>{
+      this.bufferPlayer = new BufferPlayer({ context, soundBuffers: bufferLoader.bufferList});
+
+    })  
 
     this.render()
   }
@@ -91,17 +98,74 @@ export default class TrackerElement extends HTMLElement{
 
     return newHeader;
   }
+
+  formDataToObject = ( inputArray )=>{
+    let output = {
+      root:{},
+      target: null,
+      lastIndex: null,
+      previousKey: null,
+    };
+    
+    let formArray = inputArray.map( ([name, value])=>{
+      let separatedName = name.replace(/]/g,'').split('[');
+      return separatedName.concat(value)
+    })
+  
+    // for each input row
+    formArray.forEach(function( inputArray, rowIndex ){
+        this.lastIndex = Math.max(inputArray.length-1, 0)
+  
+        // for each input in row
+        inputArray.forEach( function(inputValue, entryIndex) {
+  
+          if(this.target == null) this.target = this.root;
+  
+          if( entryIndex == this.lastIndex ){
+              // set the last as an index
+              if( Array.isArray( this.target )){
+                this.target.push( inputValue )
+              }else{
+                throw new Error('should have been an array')
+              }
+              // clear up for next row
+              this.target = null
+              this.lastIndex = null
+              this.previousKey = null
+          }else{
+  
+            // add the object key 
+            if( !(inputValue in this.target)){
+              if( this.lastIndex == entryIndex + 1){
+                this.target[ inputValue ] = []
+              }else{
+                this.target[inputValue] ={}
+              }
+            }
+            this.target = this.target[inputValue]
+            this.previousKey = inputValue;
+          }
+        
+        },output)
+    }, output)
+  
+    return output.root;
+  }
+
+  playLoop =()=>{
+    // get the track data 
+    // 
+  }
   
 }
 
 TrackerElement.prototype.getData = function(){
   let form = this.shadowRoot.querySelector('form')
 
-  var formData = new FormData(form);
-
-  console.log(...formData)
-
+  let formData = new FormData(form);
   let formDataArray = new Array(...formData);
 
-  return formDataArray;
+  let trackObject = this.formDataToObject(formDataArray);
+
+  return trackObject;
 }
