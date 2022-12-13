@@ -4,7 +4,7 @@
   "description": "Simple Playing with web AudioAPI",
   "main": "app.js",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "rollup": "^2.21.0",
     "stampit": "^4.3.1"
   },
